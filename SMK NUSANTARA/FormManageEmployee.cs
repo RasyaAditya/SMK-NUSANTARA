@@ -24,6 +24,8 @@ namespace SMK_NUSANTARA
         {
             loadDgv();
             enableButton(true);
+            getID();
+            accessButtonAndField(true);
             cbPosition.Items.AddRange(new string[]
             {
                 "Admin",
@@ -41,19 +43,47 @@ namespace SMK_NUSANTARA
                 x.Name,
                 x.Email,
                 x.Handphone,
-                x.Position
+                x.Position,
+                x.Password
             });
 
             dgvData.DataSource = query;
+            dgvData.Columns["Password"].Visible = false;
+        }
+
+        private void enabeField(bool e)
+        {
+            tbName.Enabled = !e;
+            tbEmail.Enabled = !e;
+            tbHandphone.Enabled = !e;
+            cbPosition.Enabled = !e;
         }
 
         private void enableButton(bool e)
         {
 
             btnInsert.Enabled = e;
-            btnUpdate.Enabled = !e;
-            btnDelete.Enabled = !e;
+            btnUpdate.Enabled = e;
+            btnDelete.Enabled = e;
+            btnSave.Enabled = !e;
+            btnCancel.Enabled = !e;
 
+        }
+
+        private void visibleButton(bool e)
+        {
+            btnInsert.Visible = e;
+            btnUpdate.Visible = e;
+            btnDelete.Visible = e;
+            btnSave.Visible = !e;
+            btnCancel.Visible = !e;
+        }
+
+        private void accessButtonAndField(bool e)
+        {
+            enabeField(e);
+            enableButton(e);
+            visibleButton(e);
         }
 
         
@@ -66,24 +96,6 @@ namespace SMK_NUSANTARA
                 return false;
             }
             return true;
-        }
-
-        private void btnInsert_Click(object sender, EventArgs e)
-        {
-            if (Validation())
-            {
-                var a = new Msemployee();
-                a.EmployeeID = tbEmployeeId.Text;
-                a.Name = tbName.Text;
-                a.Email = tbEmail.Text;
-                a.Handphone = tbHandphone.Text;
-                a.Position = cbPosition.Text;
-
-                db.Msemployees.InsertOnSubmit(a);
-                db.SubmitChanges();
-                Support.MSI("Insert Data Success");
-                Support.clearFields(this);
-            }
         }
 
         private void getID()
@@ -110,6 +122,14 @@ namespace SMK_NUSANTARA
             }
         }
 
+        private void btnInsert_Click(object sender, EventArgs e)
+        {
+            Support.clearFields(this);
+            status = "insert";
+            accessButtonAndField(false);
+            getID();
+        }
+
         private void btnUpdate_Click(object sender, EventArgs e)
         {
             if (currentSelectedRow == -1)
@@ -119,13 +139,96 @@ namespace SMK_NUSANTARA
             else
             {
                 status = "update";
-                btnSave.Enabled = true;
-                btnCancel.Enabled = true;
-                btnSave.Visible = true;
-                btnCancel.Visible = true;
+                accessButtonAndField(false);
             }
         }
 
-        
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            if (currentSelectedRow == -1)
+            {
+                Support.MSW("Click Row");
+            }else
+            {
+                var dialog = MessageBox.Show("Are you sure want to delete this data?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                try
+                {
+                    if(dialog == DialogResult.Yes)
+                    {
+                        var delete = db.Msemployees.FirstOrDefault(x => x.EmployeeID == tbEmployeeId.Text);
+                        db.Msemployees.DeleteOnSubmit(delete);
+                        db.SubmitChanges();
+                        loadDgv();
+                        Support.MSI("Delete Data Success");
+                        Support.clearFields(this);
+                        getID();
+                    }
+                }catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (status == "insert")
+            {
+                if (Validation())
+                {
+                    var a = new Msemployee();
+                    a.EmployeeID = tbEmployeeId.Text;
+                    a.Name = tbName.Text;
+                    a.Email = tbEmail.Text;
+                    a.Handphone = tbHandphone.Text;
+                    a.Position = cbPosition.Text;
+                    a.Password = "";
+
+                    db.Msemployees.InsertOnSubmit(a);
+                    db.SubmitChanges();
+                    loadDgv();
+                    Support.MSI("Insert Data Success");
+                    Support.clearFields(this);
+                    accessButtonAndField(true);
+                    getID();
+                }
+            }
+
+
+            if (status == "update")
+            {
+                if (Validation())
+                {
+                    try
+                    {
+                        var queryUpdate = db.Msemployees.FirstOrDefault(x => x.EmployeeID == tbEmployeeId.Text);
+                        if(queryUpdate != null)
+                        {
+                            queryUpdate.Name = tbName.Text;
+                            queryUpdate.Email = tbEmail.Text;
+                            queryUpdate.Handphone = tbHandphone.Text;
+                            queryUpdate.Position = cbPosition.Text;
+
+                            db.SubmitChanges();
+                            loadDgv();
+                            Support.MSI("Update Data Success");
+                            Support.clearFields(this);
+                            accessButtonAndField(true);
+                            getID();
+                        }
+                    }catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
+            }
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            status = "";
+            accessButtonAndField(true);
+        }
     }
 }

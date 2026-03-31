@@ -83,6 +83,7 @@
             // tbEmployeeId
             // 
             this.tbEmployeeId.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbEmployeeId.Enabled = false;
             this.tbEmployeeId.Location = new System.Drawing.Point(247, 295);
             this.tbEmployeeId.Name = "tbEmployeeId";
             this.tbEmployeeId.Size = new System.Drawing.Size(187, 20);
@@ -176,6 +177,7 @@
             this.btnDelete.TabIndex = 19;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // btnSave
             // 
@@ -187,6 +189,7 @@
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Visible = false;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnCancel
             // 
@@ -198,6 +201,7 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Visible = false;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // cbPosition
             // 
